@@ -1,0 +1,149 @@
+[SETTINGS]
+{
+  "Name": "USERNAME TO NAME",
+  "SuggestedBots": 1,
+  "MaxCPM": 0,
+  "LastModified": "2021-11-28T19:01:26.7627992+08:00",
+  "AdditionalInfo": "",
+  "RequiredPlugins": [],
+  "Author": "MQI",
+  "Version": "v1",
+  "SaveEmptyCaptures": false,
+  "ContinueOnCustom": false,
+  "SaveHitsToTextFile": false,
+  "IgnoreResponseErrors": false,
+  "MaxRedirects": 8,
+  "NeedsProxies": false,
+  "OnlySocks": false,
+  "OnlySsl": false,
+  "MaxProxyUses": 0,
+  "BanProxyAfterGoodStatus": false,
+  "BanLoopEvasionOverride": -1,
+  "EncodeData": false,
+  "AllowedWordlist1": "",
+  "AllowedWordlist2": "",
+  "DataRules": [],
+  "CustomInputs": [],
+  "ForceHeadless": false,
+  "AlwaysOpen": false,
+  "AlwaysQuit": false,
+  "QuitOnBanRetry": false,
+  "DisableNotifications": false,
+  "CustomUserAgent": "",
+  "RandomUA": false,
+  "CustomCMDArgs": ""
+}
+
+[SCRIPT]
+#REPLACE PARSE "<DATA>" LR "" "@" -> VAR "REPLACE" 
+
+#REPLACE FUNCTION Replace "[^0-9a-zA-Z]+" "" UseRegex=TRUE "<REPLACE>" -> VAR "REPLACE" 
+
+#REPLACE FUNCTION Replace "\\d" "" UseRegex=TRUE "<REPLACE>" -> VAR "REPLACE" 
+
+#NAME FUNCTION Constant "<REPLACE>" -> VAR "NAME" 
+
+#CNAME FUNCTION Length "<NAME>" -> VAR "CNAME" 
+
+#CNAME FUNCTION Compute "<CNAME> + 5" -> VAR "CNAME" 
+
+#R1 REQUEST GET "https://mbasic.facebook.com/<REPLACE>" 
+  
+  HEADER "accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9" 
+  HEADER "accept-encoding: gzip, deflate, br" 
+  HEADER "accept-language: vi" 
+  HEADER "sec-ch-ua: \"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"" 
+  HEADER "sec-ch-ua-mobile: ?0" 
+  HEADER "sec-ch-ua-platform: \"Windows\"" 
+  HEADER "sec-fetch-dest: document" 
+  HEADER "sec-fetch-mode: navigate" 
+  HEADER "sec-fetch-site: none" 
+  HEADER "sec-fetch-user: ?1" 
+  HEADER "upgrade-insecure-requests: 1" 
+  HEADER "user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36" 
+
+IF "<SOURCE>" Contains "<div class=\"bq br bs\" id=\"cover-name-root\"><h3 class=\"bt\">"
+
+#NAME PARSE "<SOURCE>" LR "<div class=\"bq br bs\" id=\"cover-name-root\"><h3 class=\"bt\">" "</h3>" CreateEmpty=FALSE -> CAP "NAME" 
+
+ELSE
+
+#R2 REQUEST GET "https://www.google.com/search?q=<REPLACE>&oq=<DATA>&aqs=chrome..69i57j0i333.768j0j7&sourceid=chrome&ie=UTF-8" 
+  
+  HEADER "accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9" 
+  HEADER "accept-encoding: gzip, deflate, br" 
+  HEADER "accept-language: vi" 
+  HEADER "sec-ch-ua: \"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"" 
+  HEADER "sec-ch-ua-mobile: ?0" 
+  HEADER "sec-ch-ua-platform: \"Windows\"" 
+  HEADER "sec-fetch-dest: document" 
+  HEADER "sec-fetch-mode: navigate" 
+  HEADER "sec-fetch-site: none" 
+  HEADER "sec-fetch-user: ?1" 
+  HEADER "upgrade-insecure-requests: 1" 
+  HEADER "user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36" 
+
+#NAME PARSE "<SOURCE>" LR "<b><i>" "</i>" CreateEmpty=FALSE -> CAP "NAME" 
+
+ENDIF
+IF "<SOURCE>" DoesNotContain "<b><i>" 
+
+#R3 REQUEST GET "https://www.google.com/search?q=<REPLACE>&oq=<REPLACE>+site%3Afacebook.com&aqs=chrome..69i57j0i333.768j0j7&sourceid=chrome&ie=UTF-8" 
+  
+  HEADER "accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9" 
+  HEADER "accept-encoding: gzip, deflate, br" 
+  HEADER "accept-language: vi" 
+  HEADER "sec-ch-ua: \"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"" 
+  HEADER "sec-ch-ua-mobile: ?0" 
+  HEADER "sec-ch-ua-platform: \"Windows\"" 
+  HEADER "sec-fetch-dest: document" 
+  HEADER "sec-fetch-mode: navigate" 
+  HEADER "sec-fetch-site: none" 
+  HEADER "sec-fetch-user: ?1" 
+  HEADER "upgrade-insecure-requests: 1" 
+  HEADER "user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36" 
+
+#NAME PARSE "<SOURCE>" LR "<h3 class=\"LC20lb MBeuO DKV0Md\">" " (@" CreateEmpty=FALSE -> CAP "NAME" 
+
+#COUNT FUNCTION Length "<NAME>" -> VAR "COUNT" 
+
+IF "<COUNT>" GreaterThan "32"
+
+#NAME PARSE "<NAME>" LR "<h3 class=\"LC20lb MBeuO DKV0Md\">" "" CreateEmpty=FALSE -> CAP "NAME" 
+
+ENDIF
+ENDIF
+
+#NAME PARSE "<SOURCE>" LR "View the profiles of people named <em>" "</em>" CreateEmpty=FALSE -> CAP "NAME" 
+
+#NAME FUNCTION Replace "[^a-zA-Z ]" "" UseRegex=TRUE "<NAME>" -> CAP "NAME" 
+
+#CNAME2 FUNCTION Length "<NAME>" -> VAR "CNAME2" 
+
+#FIRST PARSE "<NAME>" LR " " "" -> VAR "FIRST" 
+
+#LAST PARSE "<NAME>" LR "" " " -> VAR "LAST" 
+
+#CFIRST FUNCTION Length "<FIRST>" -> VAR "CFIRST" 
+
+IF "<CNAME2>" GreaterThan "<CNAME>"
+
+#SAVE UTILITY File "HitsResult/ten-dai.txt" AppendLines "<DATA>" -> VAR "SAVE" 
+
+SET STATUS FAIL
+ENDIF
+IF "<CFIRST>" EqualTo "0"
+
+#SAVE UTILITY File "HitsResult/username-to-name.txt" AppendLines "<DATA>|<NAME>" -> VAR "SAVE" 
+
+ENDIF
+IF "<CFIRST>" NotEqualTo "0"
+
+#SAVE UTILITY File "HitsResult/username-to-name.txt" AppendLines "<DATA>|<LAST> <FIRST>|<FIRST> <LAST>|<REPLACE>" -> VAR "SAVE" 
+
+ENDIF
+
+KEYCHECK 
+  KEYCHAIN Success OR 
+    KEY "" 
+
